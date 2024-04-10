@@ -1,14 +1,13 @@
-import { app, shell, BrowserWindow } from 'electron'
+import { app, shell, ipcMain, BrowserWindow } from 'electron'
 import { join } from 'path'
 import icon from '../../../resources/icon.png?asset'
 
 let loginWindow: BrowserWindow
 
 export function createLoginWindow(): void {
-  // Create the browser window.
   loginWindow = new BrowserWindow({
-    width: 800,
-    height: 600,
+    width: 300,
+    height: 400,
     show: false,
     autoHideMenuBar: true,
     titleBarStyle: 'hidden',
@@ -24,7 +23,12 @@ export function createLoginWindow(): void {
 
   loginWindow.on('ready-to-show', () => {
     loginWindow.show()
-    loginWindow.webContents.openDevTools()
+    ipcMain.on('renderer', (e, args) => {
+      const { from } = args
+      if (from === 'login') {
+        loginWindow.close()
+      }
+    })
   })
 
   loginWindow.webContents.setWindowOpenHandler((details) => {
@@ -32,8 +36,6 @@ export function createLoginWindow(): void {
     return { action: 'deny' }
   })
 
-  // HMR for renderer base on electron-vite cli.
-  // Load the remote URL for development or the local html file for production.
   if (!app.isPackaged && process.env['ELECTRON_RENDERER_URL']) {
     loginWindow.loadURL(`${process.env['ELECTRON_RENDERER_URL']}/login.html`)
   } else {
