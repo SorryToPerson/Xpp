@@ -1,5 +1,6 @@
 import { app, shell, BrowserWindow } from 'electron'
 import { join } from 'path'
+import store from '../utils/store'
 import icon from '../../../resources/icon.png?asset'
 
 let mainWindow: BrowserWindow
@@ -23,8 +24,17 @@ export function createMainWindow(): void {
   })
 
   mainWindow.on('ready-to-show', () => {
+    const userInfo = store.get('userInfo')
     mainWindow.show()
     mainWindow.webContents.openDevTools()
+    if (Object.keys(userInfo).length > 0) {
+      console.log('ASJDFKSAJKFJSL')
+
+      mainWindow.webContents.send('main', {
+        from: 'mainWindow',
+        data: userInfo
+      })
+    }
   })
 
   mainWindow.webContents.setWindowOpenHandler((details) => {

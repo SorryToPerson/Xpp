@@ -2,6 +2,12 @@ import { app, BrowserWindow, ipcMain } from 'electron'
 import { createMainWindow } from './windows/mainWindow'
 import { createLoginWindow } from './windows/loginWindow'
 import { electronApp, optimizer } from '@electron-toolkit/utils'
+import store from './utils/store'
+
+function createWindows(): void {
+  const userInfo = store.get('userInfo')
+  Object.keys(userInfo).length > 0 ? createMainWindow() : createLoginWindow()
+}
 
 app.whenReady().then(() => {
   electronApp.setAppUserModelId('com.electron')
@@ -10,16 +16,17 @@ app.whenReady().then(() => {
     optimizer.watchWindowShortcuts(window)
   })
 
-  // IPC test
-  ipcMain.on('ping', () => console.log('pong'))
-  ipcMain.on('renderer', (e, data) => {
+  ipcMain.on('renderer', (e, { from, data }) => {
     console.log('login from main', data)
-    createMainWindow()
+    if (from === 'login') {
+      store.set('userInfo', data)
+      createMainWindow()
+    }
   })
-  createLoginWindow()
+  createWindows()
 
   app.on('activate', function () {
-    if (BrowserWindow.getAllWindows().length === 0) createMainWindow()
+    if (BrowserWindow.getAllWindows().length === 0) createWindows()
   })
 })
 
