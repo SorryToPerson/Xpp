@@ -15,9 +15,8 @@ app.whenReady().then(() => {
   app.on('browser-window-created', (_, window) => {
     optimizer.watchWindowShortcuts(window)
   })
-  store.set('userInfo', {})
 
-  ipcMain.on('renderer', (e, { from, data }) => {
+  ipcMain.on('renderer', (_, { from, data }) => {
     console.log('login from main', data)
     if (from === 'login') {
       store.set('userInfo', data)

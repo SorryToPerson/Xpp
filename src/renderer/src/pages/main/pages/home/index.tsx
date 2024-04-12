@@ -1,18 +1,14 @@
-import { useEffect, useState } from 'react'
-import { IUserInfo } from '@renderer/typings/global'
+import { useEffect } from 'react'
 import { InboxOutlined } from '@ant-design/icons'
 import type { UploadProps } from 'antd'
 import { message, Upload } from 'antd'
+import { useGlobalStore } from '@renderer/store/global'
 
 const { Dragger } = Upload
 import styles from './index.module.less'
 
 export default function Main(): JSX.Element {
-  const [userInfo, setUserInfo] = useState<IUserInfo>({
-    username: '',
-    password: ''
-  })
-  console.log(userInfo)
+  const setUserInfo = useGlobalStore((state) => state.setUserInfo)
 
   const { ipcRenderer } = window.electron
 
@@ -35,8 +31,7 @@ export default function Main(): JSX.Element {
       console.log('Dropped files', e.dataTransfer.files)
     }
   }
-  const handleMessageFromMain = (_e, { from, data }): void => {
-    console.log(from, data)
+  const handleMessageFromMain = (_, { from, data }): void => {
     if (from === 'mainWindow') {
       setUserInfo(data)
     }
