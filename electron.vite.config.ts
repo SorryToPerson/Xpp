@@ -15,6 +15,13 @@ export default defineConfig({
         '@renderer': resolve('src/renderer/src')
       }
     },
+    css: {
+      preprocessorOptions: {
+        less: {
+          math: 'parens-division'
+        }
+      }
+    },
     plugins: [react()],
     build: {
       rollupOptions: {
